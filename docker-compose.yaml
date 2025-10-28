@@ -1,0 +1,29 @@
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "${PORT:-8080}:80"
+    volumes:
+      - ./entrypoint-nginx.sh:/docker-entrypoint.sh:ro
+    environment:
+      - ACTIVE_POOL=${ACTIVE_POOL:-blue}
+    depends_on:
+      - app_blue
+      - app_green
+    command: /docker-entrypoint.sh
+
+  app_blue:
+    image: ${BLUE_IMAGE}
+    ports:
+      - "8081:3000"
+    environment:
+      - RELEASE_ID=${RELEASE_ID_BLUE:-v1.0.0-blue}
+      - APP_POOL=blue
+
+  app_green:
+    image: ${GREEN_IMAGE}
+    ports:
+      - "8082:3000"
+    environment:
+      - RELEASE_ID=${RELEASE_ID_GREEN:-v1.0.0-green}
+      - APP_POOL=green
